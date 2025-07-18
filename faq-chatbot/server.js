@@ -17,7 +17,7 @@ const pinecone = new Pinecone({
 });
 const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX);
 const embeddingModel = genAI.getGenerativeModel({ model: "embedding-001" });
-const chatModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+const chatModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 app.post('/api/chat', async (req, res) => {
     try {
