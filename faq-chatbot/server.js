@@ -1,17 +1,16 @@
-// FINAL server.js
+// FINAL - FORCED SERVICE ACCOUNT AUTH
 import express from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Pinecone } from '@pinecone-database/pinecone';
-import { GoogleAuth } from 'google-auth-library'; // <-- NEW IMPORT
+import { GoogleAuth } from 'google-auth-library';
 
 dotenv.config();
 
-// This function starts the server after setting up the new authentication
-async function startServer() {
-    // --- NEW AUTHENTICATION SETUP ---
-    // This automatically finds and uses your new google-credentials.json secret file
+async function initializeAndStartServer() {
+    // --- FORCED SERVICE ACCOUNT AUTHENTICATION ---
+    // This block explicitly loads your JSON secret file and creates an authenticated client
     const auth = new GoogleAuth({
         scopes: 'https://www.googleapis.com/auth/cloud-platform',
     });
@@ -22,9 +21,10 @@ async function startServer() {
     app.use(cors());
     app.use(express.json());
 
-    // Initialize clients using the new auth method
-    const genAI = new GoogleGenerativeAI({ authClient }); // <-- Use the new authClient
+    // Initialize clients using the explicit authClient, forcing it to ignore API keys
+    const genAI = new GoogleGenerativeAI({ authClient });
     const pinecone = new Pinecone();
+
     const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX);
     const embeddingModel = genAI.getGenerativeModel({ model: "embedding-001" });
     const chatModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -65,7 +65,12 @@ async function startServer() {
     app.listen(PORT, () => {
         console.log(`✅ Server is running on port ${PORT}`);
     });
+
+    console.log('Server initialized with explicit Service Account authentication.');
 }
 
 // Run the server setup
-startServer().catch(console.error);
+initializeAndStartServer().catch(error => {
+    console.error("Failed to initialize and start server:", error);
+    process.exit(1);
+});
