@@ -29,6 +29,9 @@ app.post('/api/chat', async (req, res) => {
             vector: embeddingResult.embedding.values,
             topK: 3,
             includeMetadata: true,
+            filter: {
+                "score":{"$gte": 0.7}
+            }
         });
         const context = queryResponse.matches.map(match => match.metadata.text).join("\n\n---\n\n");
 
@@ -58,25 +61,6 @@ app.post('/api/chat', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
-// Add this entire block for debugging
-app.get('/api/test-pinecone', async (req, res) => {
-  try {
-    console.log('--- Running Pinecone Connection Test ---');
-    const fetchResponse = await pineconeIndex.fetch(['faq-1']);
-    console.log('--- Pinecone Fetch Response ---', fetchResponse);
-    res.json({
-      message: "Successfully connected to Pinecone and fetched record 'faq-1'.",
-      data: fetchResponse
-    });
-  } catch (error) {
-    console.error('--- Pinecone Connection Test FAILED ---', error);
-    res.status(500).json({
-      message: "Failed to connect to Pinecone.",
-      error: error.message
-    });
-  }
-});
 
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
