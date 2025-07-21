@@ -118,8 +118,8 @@
         
         // --- MODIFIED CODE BLOCK START ---
         async function getAIResponse(userMessage) {
-            // NOTE: Replace this URL with your live Render URL once deployed
-            const API_URL = 'http://localhost:3000/api/chat'; 
+            // Using deployed Render backend
+            const API_URL = 'https://jmcg-chat.onrender.com/api/chat'; 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
